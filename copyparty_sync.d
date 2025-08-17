@@ -171,6 +171,16 @@ int main() {
 	int status = 0;
     bool verbose = false;
 
+    // There is a known problem when running this
+    // program under Zellij. If Zellij instance is detected,
+    // exit this program.
+    string in_zellij = environment.get("ZELLIJ");
+    if (strip(in_zellij) == "0") {
+        writeln("Copyparty_sync cannot be run under Zellij.");
+        writeln("Aborting now...");
+        return -1;
+    }
+
     copyparty_server server_cfg = read_server_cfg();
     if (server_cfg.none)
         return -1;
