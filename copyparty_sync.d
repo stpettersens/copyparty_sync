@@ -194,11 +194,18 @@ int main() {
     writefln("Uploading file(s) to '%s'.", dir);
     writeln("Uploading file(s) which match patterns: ", patterns);
     writeln();
+    // Track files that have been uploaded to prevent duplication in uploads.
+    string[] done = new string[0];
     foreach (p; patterns) {
         auto _matches = dirEntries(getcwd(), p, SpanMode.depth);
         foreach (file; _matches) {
-            status = upload_file_to_copyparty
-            (verbose, &server_cfg, dir, baseName(file));
+            string f = baseName(file);
+            if (!done.canFind(f)) {
+                status = upload_file_to_copyparty
+                (verbose, &server_cfg, dir, f);
+                // Only done if was actually uploaded.
+                if (status == 0) done ~= f;
+            }
         }
     }
 

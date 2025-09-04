@@ -11,6 +11,11 @@ ifeq ($(uname),Windows)
 	rm=del
 endif
 
+ifeq ($(uname),CYGWIN_NT-10.0-19044)
+	o=.obj
+	exe=.exe
+endif
+
 make:
 	ldc2 copyparty_sync.d
 	$(rm) copyparty_sync$(o)
