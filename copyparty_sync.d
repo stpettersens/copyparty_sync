@@ -7,28 +7,28 @@ import std.process;
 import std.algorithm;
 
 struct copyparty_server {
-	string username;
-	string password;
-	string proto;
-	string domain;
-	string want_format;
+    string username;
+    string password;
+    string proto;
+    string domain;
+    string want_format;
     bool none;
 }
 
 struct file_matches {
-	string file_pattern;
-	string target_dir;
+    string file_pattern;
+    string target_dir;
     string listen_for_text;
     bool none;
 }
 
 int upload_file_to_copyparty(bool verbose, copyparty_server* s, string dir, string file) {
     string endpoint = format("%s://%s/%s/", s.proto, s.domain, dir);
-	string curl_switch = " ";
+    string curl_switch = " ";
 
-	version(Windows) {
-		curl_switch = " -k";
-	}
+    version(Windows) {
+        curl_switch = " -k";
+    }
 
     string request1 = format("curl%s -s -I %s%s --user %s:%s",
     curl_switch,
@@ -72,63 +72,63 @@ int upload_file_to_copyparty(bool verbose, copyparty_server* s, string dir, stri
         }
     }
 
-	string request3 = format("curl%s -s -u %s:%s -F f=@%s %s",
-	curl_switch,
-	s.username,
-	s.password,
-	file,
-	endpoint);
+    string request3 = format("curl%s -s -u %s:%s -F f=@%s %s",
+    curl_switch,
+    s.username,
+    s.password,
+    file,
+    endpoint);
 
     request3 ~= format("?want=%s", s.want_format);
     request3 ~= " | jq .status";
 
-	auto upload = executeShell(request3);
+    auto upload = executeShell(request3);
 
     if (verbose)
         writeln(request3);
 
-	if (upload.status != 0) {
-		writefln("Failed to upload file: '%s'.", file);
+    if (upload.status != 0) {
+        writefln("Failed to upload file: '%s'.", file);
         writefln("Server status: %s", upload.output);
-		return -1;
-	}
+        return -1;
+    }
 
-	writefln("Uploaded file: '%s'.", file);
+    writefln("Uploaded file: '%s'.", file);
     writefln("Server status: %s", upload.output);
-	return 0;
+    return 0;
 }
 
 copyparty_server read_server_cfg() {
-	copyparty_server s;
-	string cfg = buildPath(getcwd(), "copyparty_sync_server.cfg");
-	if (cfg.exists) {
-		auto f = File(cfg);
-		foreach (line; f.byLine()) {
-			string l = to!string(line);
-			if (l.startsWith("#")) {
-				// Ignore any comment lines.
-				continue;
-			}
+    copyparty_server s;
+    string cfg = buildPath(getcwd(), "copyparty_sync_server.cfg");
+    if (cfg.exists) {
+        auto f = File(cfg);
+        foreach (line; f.byLine()) {
+            string l = to!string(line);
+            if (l.startsWith("#")) {
+                // Ignore any comment lines.
+                continue;
+            }
 
-			if (s.username.length == 0)
-				s.username = to!string(l);
+            if (s.username.length == 0)
+                s.username = to!string(l);
 
-			else if (s.password.length == 0)
-				s.password = to!string(l);
+            else if (s.password.length == 0)
+                s.password = to!string(l);
 
-			else if (s.proto.length == 0)
-				s.proto = to!string(l);
+            else if (s.proto.length == 0)
+                s.proto = to!string(l);
 
-			else if (s.domain.length == 0)
-				s.domain = to!string(l);
+            else if (s.domain.length == 0)
+                s.domain = to!string(l);
 
-			else if (s.want_format.length == 0)
-				s.want_format = to!string(l).toLower();
-		}
+            else if (s.want_format.length == 0)
+                s.want_format = to!string(l).toLower();
+        }
 
         s.none = false;
-		return s;
-	}
+        return s;
+    }
 
     writeln("Aborting, there is no server configuration to use.");
     s.none = true;
@@ -136,31 +136,30 @@ copyparty_server read_server_cfg() {
 }
 
 file_matches read_matches_cfg() {
-	file_matches m;
-	string cfg = buildPath(getcwd(), "copyparty_sync_matches.cfg");
-	if (cfg.exists) {
-		auto f = File(cfg);
-		foreach (line; f.byLine()) {
-			string l = to!string(line);
-			if (l.startsWith("#")) {
-				// Ignore any comment lines.
-				continue;
-			}
+    file_matches m;
+    string cfg = buildPath(getcwd(), "copyparty_sync_matches.cfg");
+    if (cfg.exists) {
+        auto f = File(cfg);
+        foreach (line; f.byLine()) {
+            string l = to!string(line);
+            if (l.startsWith("#")) {
+                // Ignore any comment lines.
+                continue;
+            }
 
-			if (m.file_pattern.length == 0)
-				m.file_pattern = to!string(l);
+            if (m.file_pattern.length == 0)
+                m.file_pattern = to!string(l);
 
             else if (m.target_dir.length == 0)
                 m.target_dir = to!string(l);
 
             else if (m.listen_for_text.length == 0)
                 m.listen_for_text = to!string(l);
-
-		}
+        }
 
         m.none = false;
-		return m;
-	}
+        return m;
+    }
 
     writeln("Aborting, there is no matches configuration to use.");
     m.none = true;
@@ -168,7 +167,7 @@ file_matches read_matches_cfg() {
 }
 
 int main() {
-	int status = 0;
+    int status = 0;
     bool verbose = false;
 
     // There is a known problem when running this
@@ -209,5 +208,5 @@ int main() {
         }
     }
 
-	return status;
+    return status;
 }
