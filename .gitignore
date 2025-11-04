@@ -1,4 +1,7 @@
-backup
 copyparty_sync
+*sha256*
 *.cfg
 *.exe
+*.zip
+*.tar
+*.tar.gz
